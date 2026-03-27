@@ -1,0 +1,15 @@
+import type { Metadata } from 'next';
+import type { ReactNode } from 'react';
+
+export const metadata: Metadata = {
+  title: 'Braxxis Finance',
+  description: 'Braxxis Finance Platform',
+};
+
+export default function RootLayout({ children }: { children: ReactNode }): ReactNode {
+  return (
+    <html lang="en">
+      <body>{children}</body>
+    </html>
+  );
+}

@@ -1,0 +1,27 @@
+{
+  "name": "@braxxis/infrastructure",
+  "version": "0.0.1",
+  "private": true,
+  "type": "module",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "test": "vitest run",
+    "typecheck": "tsc --noEmit",
+    "lint": "eslint src/",
+    "db:migrate": "prisma migrate dev",
+    "db:seed": "prisma db seed"
+  },
+  "dependencies": {
+    "@braxxis/domain": "workspace:*",
+    "@braxxis/application": "workspace:*",
+    "@prisma/client": "^6.2.0",
+    "tsyringe": "^4.8.0"
+  },
+  "devDependencies": {
+    "prisma": "^6.2.0",
+    "vitest": "^3.0.0",
+    "typescript": "^5.7.0"
+  }
+}
