@@ -3,8 +3,14 @@
   "version": "0.0.1",
   "private": true,
   "type": "module",
-  "main": "dist/index.js",
-  "types": "dist/index.d.ts",
+  "main": "src/index.ts",
+  "types": "src/index.ts",
+  "exports": {
+    ".": {
+      "types": "./src/index.ts",
+      "default": "./src/index.ts"
+    }
+  },
   "scripts": {
     "build": "tsc",
     "test": "vitest run",
@@ -12,7 +18,8 @@
     "lint": "eslint src/"
   },
   "dependencies": {
-    "@braxxis/domain": "workspace:*"
+    "@braxxis/domain": "workspace:*",
+    "@braxxis/shared": "workspace:*"
   },
   "devDependencies": {
     "vitest": "^3.0.0",
