@@ -1,5 +1,11 @@
 import type { FastifyError, FastifyReply, FastifyRequest } from 'fastify';
-import { DomainError } from '@braxxis/domain';
+import {
+  DomainError,
+  InvalidCredentialsError,
+  UserAlreadyExistsError,
+  InvalidEmailError,
+  WeakPasswordError,
+} from '@braxxis/domain';
 
 interface HttpErrorResponse {
   status: number;
@@ -7,6 +13,18 @@ interface HttpErrorResponse {
 }
 
 function toHttpError(err: unknown): HttpErrorResponse {
+  if (err instanceof InvalidCredentialsError) {
+    return { status: 401, message: err.message };
+  }
+  if (err instanceof UserAlreadyExistsError) {
+    return { status: 409, message: err.message };
+  }
+  if (err instanceof InvalidEmailError) {
+    return { status: 400, message: err.message };
+  }
+  if (err instanceof WeakPasswordError) {
+    return { status: 400, message: err.message };
+  }
   if (err instanceof DomainError) {
     return { status: 400, message: err.message };
   }
@@ -15,9 +33,10 @@ function toHttpError(err: unknown): HttpErrorResponse {
 
 export function errorHandler(
   error: FastifyError,
-  _request: FastifyRequest,
+  request: FastifyRequest,
   reply: FastifyReply,
 ): void {
   const { status, message } = toHttpError(error);
+  request.log.error({ err: error }, 'Request error');
   reply.status(status).send({ error: message });
 }
