@@ -24,49 +24,75 @@ export function SignInForm(): ReactNode {
   }
 
   return (
-    <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+    <form onSubmit={handleSubmit} className="flex flex-col gap-5">
       {storeError && (
-        <div role="alert" style={{ padding: '0.75rem', backgroundColor: '#fee', color: '#c00', borderRadius: '4px' }}>
+        <div
+          role="alert"
+          className="px-4 py-3 rounded-xl text-sm"
+          style={{
+            background: 'rgba(239, 68, 68, 0.1)',
+            border: '1px solid rgba(239, 68, 68, 0.25)',
+            color: '#f87171',
+          }}
+        >
           {storeError}
         </div>
       )}
-      <label>
-        <span style={{ display: 'block', marginBottom: '0.25rem', fontSize: '0.875rem' }}>Email</span>
+
+      <label className="flex flex-col gap-1.5">
+        <span className="text-xs font-medium uppercase tracking-widest" style={{ color: 'var(--color-text-muted)' }}>
+          Email
+        </span>
         <input
           type="email"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           required
-          style={{ width: '100%', padding: '0.5rem', border: '1px solid #ccc', borderRadius: '4px' }}
+          placeholder="you@example.com"
+          className="w-full px-4 py-3 rounded-xl text-sm text-white placeholder:text-white/25 outline-none transition-all duration-200 focus:ring-2 focus:ring-purple-accent/40"
+          style={{
+            background: 'rgba(255, 255, 255, 0.04)',
+            border: '1px solid var(--color-border-card)',
+          }}
         />
       </label>
-      <label>
-        <span style={{ display: 'block', marginBottom: '0.25rem', fontSize: '0.875rem' }}>Password</span>
+
+      <label className="flex flex-col gap-1.5">
+        <span className="text-xs font-medium uppercase tracking-widest" style={{ color: 'var(--color-text-muted)' }}>
+          Password
+        </span>
         <input
           type="password"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
           required
-          style={{ width: '100%', padding: '0.5rem', border: '1px solid #ccc', borderRadius: '4px' }}
+          placeholder="••••••••"
+          className="w-full px-4 py-3 rounded-xl text-sm text-white placeholder:text-white/25 outline-none transition-all duration-200 focus:ring-2 focus:ring-purple-accent/40"
+          style={{
+            background: 'rgba(255, 255, 255, 0.04)',
+            border: '1px solid var(--color-border-card)',
+          }}
         />
       </label>
+
       <button
         type="submit"
         disabled={isLoading}
-        style={{
-          padding: '0.75rem',
-          backgroundColor: '#0070f3',
-          color: 'white',
-          border: 'none',
-          borderRadius: '6px',
-          cursor: isLoading ? 'not-allowed' : 'pointer',
-          opacity: isLoading ? 0.7 : 1,
-        }}
+        className="w-full py-3 rounded-xl font-semibold text-sm text-white transition-all duration-200 hover:brightness-90 hover:-translate-y-0.5 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:translate-y-0"
+        style={{ background: 'var(--color-purple-primary)' }}
       >
         {isLoading ? 'Signing in...' : 'Sign In'}
       </button>
-      <p style={{ textAlign: 'center', fontSize: '0.875rem', color: '#666' }}>
-        Don&apos;t have an account? <a href="/auth/sign-up">Sign up</a>
+
+      <p className="text-center text-sm" style={{ color: 'var(--color-text-muted)' }}>
+        Don&apos;t have an account?{' '}
+        <a
+          href="/auth/sign-up"
+          className="font-medium transition-colors duration-200 hover:text-white"
+          style={{ color: 'var(--color-purple-light)' }}
+        >
+          Sign up
+        </a>
       </p>
     </form>
   );

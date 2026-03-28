@@ -1,38 +1,30 @@
-import type { ReactNode } from 'react';
+import { Nav } from '@/components/sections/nav';
+import { Hero } from '@/components/sections/hero';
+import { BentoStats } from '@/components/sections/bento-stats';
+import { FeatureCards } from '@/components/sections/feature-cards';
+import { Testimonials } from '@/components/sections/testimonials';
+import { CTASection } from '@/components/sections/cta-section';
+import { Footer } from '@/components/sections/footer';
 
-export default function HomePage(): ReactNode {
+function SectionSpacer() {
+  return <div style={{ height: 'clamp(100px, 12vw, 180px)' }} />;
+}
+
+export default function HomePage() {
   return (
-    <section style={{ maxWidth: '600px', margin: '4rem auto', textAlign: 'center' }}>
-      <h1 style={{ fontSize: '2.5rem', marginBottom: '1rem' }}>Braxxis Finance</h1>
-      <p style={{ fontSize: '1.125rem', color: '#666', marginBottom: '2rem' }}>
-        Your modern investing platform. Track portfolios, analyze markets, and grow your wealth.
-      </p>
-      <div style={{ display: 'flex', gap: '1rem', justifyContent: 'center' }}>
-        <a
-          href="/auth/sign-up"
-          style={{
-            padding: '0.75rem 1.5rem',
-            backgroundColor: '#0070f3',
-            color: 'white',
-            borderRadius: '6px',
-            textDecoration: 'none',
-          }}
-        >
-          Get Started
-        </a>
-        <a
-          href="/auth/sign-in"
-          style={{
-            padding: '0.75rem 1.5rem',
-            border: '1px solid #ccc',
-            borderRadius: '6px',
-            textDecoration: 'none',
-            color: 'inherit',
-          }}
-        >
-          Sign In
-        </a>
-      </div>
-    </section>
+    <main>
+      <Nav />
+      <Hero />
+      <SectionSpacer />
+      <BentoStats />
+      <SectionSpacer />
+      <FeatureCards />
+      <SectionSpacer />
+      <Testimonials />
+      <SectionSpacer />
+      <CTASection />
+      <div style={{ height: 'clamp(60px, 8vw, 120px)' }} />
+      <Footer />
+    </main>
   );
 }
