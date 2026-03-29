@@ -60,9 +60,9 @@ export function SignUpForm(): ReactNode {
           onChange={(e) => setEmail(e.target.value)}
           required
           placeholder="you@example.com"
-          className="w-full px-4 py-3 rounded-xl text-sm text-white placeholder:text-white/25 outline-none transition-all duration-200 focus:ring-2 focus:ring-purple-accent/40"
+          className="w-full px-4 py-3 rounded-xl text-sm text-[var(--color-text-primary)] placeholder:text-[var(--color-text-primary)]/25 outline-none transition-all duration-200 focus:ring-2 focus:ring-purple-accent/40"
           style={{
-            background: 'rgba(255, 255, 255, 0.04)',
+            background: 'var(--color-input-bg)',
             border: '1px solid var(--color-border-card)',
           }}
         />
@@ -79,9 +79,9 @@ export function SignUpForm(): ReactNode {
           required
           minLength={8}
           placeholder="••••••••"
-          className="w-full px-4 py-3 rounded-xl text-sm text-white placeholder:text-white/25 outline-none transition-all duration-200 focus:ring-2 focus:ring-purple-accent/40"
+          className="w-full px-4 py-3 rounded-xl text-sm text-[var(--color-text-primary)] placeholder:text-[var(--color-text-primary)]/25 outline-none transition-all duration-200 focus:ring-2 focus:ring-purple-accent/40"
           style={{
-            background: 'rgba(255, 255, 255, 0.04)',
+            background: 'var(--color-input-bg)',
             border: '1px solid var(--color-border-card)',
           }}
         />
@@ -98,9 +98,9 @@ export function SignUpForm(): ReactNode {
           required
           minLength={8}
           placeholder="••••••••"
-          className="w-full px-4 py-3 rounded-xl text-sm text-white placeholder:text-white/25 outline-none transition-all duration-200 focus:ring-2 focus:ring-purple-accent/40"
+          className="w-full px-4 py-3 rounded-xl text-sm text-[var(--color-text-primary)] placeholder:text-[var(--color-text-primary)]/25 outline-none transition-all duration-200 focus:ring-2 focus:ring-purple-accent/40"
           style={{
-            background: 'rgba(255, 255, 255, 0.04)',
+            background: 'var(--color-input-bg)',
             border: '1px solid var(--color-border-card)',
           }}
         />
@@ -109,7 +109,7 @@ export function SignUpForm(): ReactNode {
       <button
         type="submit"
         disabled={isLoading}
-        className="w-full py-3 rounded-xl font-semibold text-sm text-white transition-all duration-200 hover:brightness-90 hover:-translate-y-0.5 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:translate-y-0"
+        className="w-full py-3 rounded-xl font-semibold text-sm text-[var(--color-text-primary)] transition-all duration-200 hover:brightness-90 hover:-translate-y-0.5 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:translate-y-0"
         style={{ background: 'var(--color-purple-primary)' }}
       >
         {isLoading ? 'Creating account...' : 'Create Account'}
@@ -119,7 +119,7 @@ export function SignUpForm(): ReactNode {
         Already have an account?{' '}
         <a
           href="/auth/sign-in"
-          className="font-medium transition-colors duration-200 hover:text-white"
+          className="font-medium transition-colors duration-200 hover:text-[var(--color-text-primary)]"
           style={{ color: 'var(--color-purple-light)' }}
         >
           Sign in
