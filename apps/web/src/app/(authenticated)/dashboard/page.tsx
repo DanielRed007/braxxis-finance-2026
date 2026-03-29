@@ -41,7 +41,7 @@ function StatCard({ stat }: { stat: typeof PORTFOLIO_STATS[number] }): ReactNode
       >
         {stat.label}
       </div>
-      <div className="text-2xl font-bold text-white mb-1">{stat.value}</div>
+      <div className="text-2xl font-bold mb-1" style={{ color: 'var(--color-text-primary)' }}>{stat.value}</div>
       <div
         className="text-xs font-medium"
         style={{ color: stat.positive ? '#4ade80' : '#f87171' }}
@@ -84,7 +84,7 @@ export default function DashboardPage(): ReactNode {
             border: '1px solid var(--color-border-card)',
           }}
         >
-          <h2 className="text-white font-semibold mb-5">Recent Activity</h2>
+          <h2 className="font-semibold mb-5" style={{ color: 'var(--color-text-primary)' }}>Recent Activity</h2>
           <div className="flex flex-col gap-3">
             {RECENT_ACTIVITY.map((item, i) => (
               <div
@@ -92,7 +92,7 @@ export default function DashboardPage(): ReactNode {
                 className="flex items-center justify-between py-3"
                 style={{
                   borderBottom: i < RECENT_ACTIVITY.length - 1
-                    ? '1px solid rgba(255,255,255,0.04)'
+                    ? '1px solid var(--color-border-card)'
                     : 'none',
                 }}
               >
@@ -109,7 +109,7 @@ export default function DashboardPage(): ReactNode {
                     {item.asset.slice(0, 2)}
                   </div>
                   <div>
-                    <div className="text-white text-sm font-medium">
+                    <div className="text-sm font-medium" style={{ color: 'var(--color-text-primary)' }}>
                       {item.action} {item.asset}
                     </div>
                     <div className="text-xs" style={{ color: 'var(--color-text-muted)' }}>
@@ -117,7 +117,7 @@ export default function DashboardPage(): ReactNode {
                     </div>
                   </div>
                 </div>
-                <div className="text-sm font-medium text-white">{item.amount}</div>
+                <div className="text-sm font-medium" style={{ color: 'var(--color-text-primary)' }}>{item.amount}</div>
               </div>
             ))}
           </div>
@@ -131,14 +131,14 @@ export default function DashboardPage(): ReactNode {
             border: '1px solid var(--color-border-card)',
           }}
         >
-          <h2 className="text-white font-semibold mb-5">Watchlist</h2>
+          <h2 className="font-semibold mb-5" style={{ color: 'var(--color-text-primary)' }}>Watchlist</h2>
           <div className="flex flex-col gap-3">
             {WATCHLIST.map((item) => (
               <div
                 key={item.symbol}
                 className="flex items-center justify-between py-3"
                 style={{
-                  borderBottom: '1px solid rgba(255,255,255,0.04)',
+                  borderBottom: '1px solid var(--color-border-card)',
                 }}
               >
                 <div className="flex items-center gap-3">
@@ -152,14 +152,14 @@ export default function DashboardPage(): ReactNode {
                     {item.symbol.slice(0, 2)}
                   </div>
                   <div>
-                    <div className="text-white text-sm font-medium">{item.symbol}</div>
+                    <div className="text-sm font-medium" style={{ color: 'var(--color-text-primary)' }}>{item.symbol}</div>
                     <div className="text-xs" style={{ color: 'var(--color-text-muted)' }}>
                       {item.name}
                     </div>
                   </div>
                 </div>
                 <div className="text-right">
-                  <div className="text-sm font-medium text-white">{item.price}</div>
+                  <div className="text-sm font-medium" style={{ color: 'var(--color-text-primary)' }}>{item.price}</div>
                   <div
                     className="text-xs font-medium"
                     style={{ color: item.positive ? '#4ade80' : '#f87171' }}

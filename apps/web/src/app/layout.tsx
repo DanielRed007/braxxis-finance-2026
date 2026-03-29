@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import type { ReactNode } from 'react';
 import { Figtree } from 'next/font/google';
+import { ThemeProvider } from '@/components/ui/theme-provider';
 import './globals.css';
 
 const figtree = Figtree({
@@ -16,8 +17,17 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: ReactNode }): ReactNode {
   return (
-    <html lang="en" className={figtree.className}>
-      <body>{children}</body>
+    <html lang="en" className={figtree.className} suppressHydrationWarning>
+      <head>
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `try{const t=JSON.parse(localStorage.getItem('braxxis-theme')||'{}');if(t.state&&t.state.theme){document.documentElement.setAttribute('data-theme',t.state.theme);document.documentElement.style.colorScheme=t.state.theme}}catch(e){}`,
+          }}
+        />
+      </head>
+      <body>
+        <ThemeProvider>{children}</ThemeProvider>
+      </body>
     </html>
   );
 }

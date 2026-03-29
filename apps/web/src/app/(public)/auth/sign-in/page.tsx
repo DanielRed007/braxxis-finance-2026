@@ -34,7 +34,7 @@ export default function SignInPage(): ReactNode {
               />
               <path d="M9 12l2 2 4-4" stroke="#a855f7" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
             </svg>
-            <span className="text-white font-bold">Braxxis</span>
+            <span className="text-[var(--color-text-primary)] font-bold">Braxxis</span>
           </a>
         </div>
 
