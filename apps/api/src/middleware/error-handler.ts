@@ -5,6 +5,9 @@ import {
   UserAlreadyExistsError,
   InvalidEmailError,
   WeakPasswordError,
+  ProfileNotFoundError,
+  InvalidPhoneError,
+  UnderageInvestorError,
 } from '@braxxis/domain';
 
 interface HttpErrorResponse {
@@ -23,6 +26,15 @@ function toHttpError(err: unknown): HttpErrorResponse {
     return { status: 400, message: err.message };
   }
   if (err instanceof WeakPasswordError) {
+    return { status: 400, message: err.message };
+  }
+  if (err instanceof ProfileNotFoundError) {
+    return { status: 404, message: err.message };
+  }
+  if (err instanceof InvalidPhoneError) {
+    return { status: 400, message: err.message };
+  }
+  if (err instanceof UnderageInvestorError) {
     return { status: 400, message: err.message };
   }
   if (err instanceof DomainError) {

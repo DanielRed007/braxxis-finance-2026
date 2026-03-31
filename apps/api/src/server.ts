@@ -5,6 +5,7 @@ import swaggerUi from '@fastify/swagger-ui';
 import { errorHandler } from './middleware/error-handler.js';
 import { healthRoutes } from './routes/health.routes.js';
 import { authRoutes } from './routes/auth.routes.js';
+import { profileRoutes } from './routes/profile.routes.js';
 
 // Initialize DI container (side-effect import)
 import '@braxxis/infrastructure';
@@ -47,6 +48,7 @@ async function bootstrap(): Promise<void> {
   // Routes
   await app.register(healthRoutes, { prefix: '/api' });
   await app.register(authRoutes, { prefix: '/api/auth' });
+  await app.register(profileRoutes, { prefix: '/api/profile' });
 
   await app.listen({ port: PORT, host: '0.0.0.0' });
 }
