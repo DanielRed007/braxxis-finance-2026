@@ -13,6 +13,35 @@ model User {
   hashedPassword String   @map("hashed_password")
   createdAt      DateTime @default(now()) @map("created_at")
   updatedAt      DateTime @updatedAt @map("updated_at")
+  profile        Profile?
 
   @@map("users")
+}
+
+model Profile {
+  userId               String   @id @map("user_id")
+  firstName            String   @map("first_name")
+  lastName             String   @map("last_name")
+  phone                String   @default("")
+  dateOfBirth          String   @default("") @map("date_of_birth")
+  country              String   @default("")
+  city                 String   @default("")
+  address              String   @default("")
+  postalCode           String   @default("") @map("postal_code")
+  taxId                String   @default("") @map("tax_id")
+  employmentStatus     String   @default("") @map("employment_status")
+  employer             String   @default("")
+  jobTitle             String   @default("") @map("job_title")
+  investmentExperience String   @default("") @map("investment_experience")
+  riskTolerance        String   @default("") @map("risk_tolerance")
+  annualIncome         String   @default("") @map("annual_income")
+  netWorth             String   @default("") @map("net_worth")
+  investmentGoal       String   @default("") @map("investment_goal")
+  sourceOfFunds        String   @default("") @map("source_of_funds")
+  createdAt            DateTime @default(now()) @map("created_at")
+  updatedAt            DateTime @updatedAt @map("updated_at")
+
+  user User @relation(fields: [userId], references: [id])
+
+  @@map("profiles")
 }

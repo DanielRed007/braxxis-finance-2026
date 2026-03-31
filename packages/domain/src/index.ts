@@ -7,3 +7,6 @@ export { Identifier } from './base/identifier.js';
 
 // Auth domain
 export * from './auth/index.js';
+
+// Profile domain
+export * from './profile/index.js';
