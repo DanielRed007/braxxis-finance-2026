@@ -2,6 +2,7 @@
 
 import { create } from 'zustand';
 import { devtools, persist } from 'zustand/middleware';
+import { apiClient } from '@/lib/api-client';
 
 type EmploymentStatus = 'employed' | 'self-employed' | 'retired' | 'student' | 'unemployed' | '';
 type InvestmentExperience = 'none' | 'beginner' | 'intermediate' | 'advanced' | 'expert' | '';
@@ -46,12 +47,14 @@ interface ProfileState {
   isSaving: boolean;
   isDirty: boolean;
   lastSaved: string | null;
+  saveError: string | null;
 }
 
 interface ProfileActions {
   updateField: <K extends keyof ProfileData>(field: K, value: ProfileData[K]) => void;
   validate: () => boolean;
-  saveProfile: () => Promise<void>;
+  saveProfile: () => Promise<boolean>;
+  loadProfile: () => Promise<void>;
   resetProfile: () => void;
 }
 
@@ -84,6 +87,7 @@ const initialState: ProfileState = {
   isSaving: false,
   isDirty: false,
   lastSaved: null,
+  saveError: null,
 };
 
 function validateProfile(profile: ProfileData): ProfileErrors {
@@ -137,20 +141,35 @@ export const useProfileStore = create<ProfileStore>()(
           return Object.keys(errors).length === 0;
         },
 
-        saveProfile: async (): Promise<void> => {
+        saveProfile: async (): Promise<boolean> => {
           const { validate } = get();
-          if (!validate()) return;
+          if (!validate()) return false;
 
-          set({ isSaving: true });
+          set({ isSaving: true, saveError: null });
 
-          // Simulate API call — replace with real endpoint later
-          await new Promise((resolve) => setTimeout(resolve, 800));
+          try {
+            const result = await apiClient.put<ProfileData>('/profile', get().profile);
+            set({
+              profile: result,
+              isSaving: false,
+              isDirty: false,
+              lastSaved: new Date().toISOString(),
+            });
+            return true;
+          } catch (err) {
+            const message = err instanceof Error ? err.message : 'Failed to save profile';
+            set({ isSaving: false, saveError: message });
+            return false;
+          }
+        },
 
-          set({
-            isSaving: false,
-            isDirty: false,
-            lastSaved: new Date().toISOString(),
-          });
+        loadProfile: async (): Promise<void> => {
+          try {
+            const result = await apiClient.get<ProfileData>('/profile');
+            set({ profile: result, isDirty: false });
+          } catch {
+            // Profile may not exist yet — keep empty state
+          }
         },
 
         resetProfile: (): void => {
