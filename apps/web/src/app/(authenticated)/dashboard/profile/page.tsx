@@ -1,9 +1,10 @@
 'use client';
 
-import type { ReactNode } from 'react';
+import { type ReactNode, useState, useEffect } from 'react';
 import { useProfileStore } from '@/stores/profile.store';
 import type { ProfileData } from '@/stores/profile.store';
 import { GradientText } from '@/components/ui/gradient-text';
+import { Modal, ModalHeader, ModalBody, ModalFooter } from '@/components/ui/modal';
 
 function Field({
   label,
@@ -170,8 +171,21 @@ export default function ProfilePage(): ReactNode {
   const isSaving = useProfileStore((s) => s.isSaving);
   const isDirty = useProfileStore((s) => s.isDirty);
   const lastSaved = useProfileStore((s) => s.lastSaved);
+  const saveError = useProfileStore((s) => s.saveError);
   const updateField = useProfileStore((s) => s.updateField);
   const saveProfile = useProfileStore((s) => s.saveProfile);
+  const loadProfile = useProfileStore((s) => s.loadProfile);
+
+  const [showSuccess, setShowSuccess] = useState(false);
+
+  useEffect(() => {
+    loadProfile();
+  }, [loadProfile]);
+
+  async function handleSave(): Promise<void> {
+    const ok = await saveProfile();
+    if (ok) setShowSuccess(true);
+  }
 
   function handleChange<K extends keyof ProfileData>(field: K) {
     return (value: string) => updateField(field, value as ProfileData[K]);
@@ -363,9 +377,14 @@ export default function ProfilePage(): ReactNode {
               You have unsaved changes
             </span>
           )}
+          {saveError && (
+            <span className="text-xs" style={{ color: '#f87171' }}>
+              {saveError}
+            </span>
+          )}
         </div>
         <button
-          onClick={saveProfile}
+          onClick={handleSave}
           disabled={isSaving || !isDirty}
           className="px-8 py-3 rounded-xl font-semibold text-sm text-white transition-all duration-200 hover:brightness-90 hover:-translate-y-0.5 disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:translate-y-0"
           style={{ background: 'var(--color-purple-primary)' }}
@@ -373,6 +392,23 @@ export default function ProfilePage(): ReactNode {
           {isSaving ? 'Saving...' : 'Save Profile'}
         </button>
       </div>
+
+      {/* Success modal */}
+      <Modal open={showSuccess} onClose={() => setShowSuccess(false)}>
+        <ModalHeader>Profile Updated</ModalHeader>
+        <ModalBody>
+          Your investor profile has been saved successfully.
+        </ModalBody>
+        <ModalFooter>
+          <button
+            onClick={() => setShowSuccess(false)}
+            className="px-5 py-2.5 rounded-xl text-sm font-semibold text-white transition-all duration-200 hover:brightness-90"
+            style={{ background: 'var(--color-purple-primary)' }}
+          >
+            Done
+          </button>
+        </ModalFooter>
+      </Modal>
     </div>
   );
 }

@@ -1,8 +1,22 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
-import { useProfileStore } from './profile.store.js';
+
+vi.mock('@/lib/api-client', () => ({
+  apiClient: {
+    get: vi.fn().mockRejectedValue(new Error('Not found')),
+    put: vi.fn().mockImplementation((_path: string, body: unknown) =>
+      Promise.resolve(body),
+    ),
+  },
+}));
+
+const { apiClient } = await import('@/lib/api-client');
+const { useProfileStore } = await import('./profile.store.js');
 
 describe('ProfileStore', () => {
   beforeEach(() => {
+    vi.mocked(apiClient.put).mockImplementation((_path: string, body: unknown) =>
+      Promise.resolve(body),
+    );
     useProfileStore.getState().resetProfile();
   });
 
@@ -16,11 +30,9 @@ describe('ProfileStore', () => {
     });
 
     it('should clear the field error on update', () => {
-      // Trigger validation to create errors
       useProfileStore.getState().validate();
       expect(useProfileStore.getState().errors.firstName).toBeDefined();
 
-      // Update field should clear its error
       useProfileStore.getState().updateField('firstName', 'John');
       expect(useProfileStore.getState().errors.firstName).toBeUndefined();
     });
@@ -93,32 +105,68 @@ describe('ProfileStore', () => {
   });
 
   describe('saveProfile', () => {
-    it('should not save when validation fails', async () => {
-      await useProfileStore.getState().saveProfile();
+    it('should return false when validation fails', async () => {
+      const result = await useProfileStore.getState().saveProfile();
 
+      expect(result).toBe(false);
       expect(useProfileStore.getState().isSaving).toBe(false);
       expect(useProfileStore.getState().lastSaved).toBeNull();
     });
 
-    it('should save and update state on success', async () => {
-      vi.useFakeTimers();
-
+    it('should call API and return true on success', async () => {
       useProfileStore.getState().updateField('firstName', 'John');
       useProfileStore.getState().updateField('lastName', 'Doe');
 
-      const savePromise = useProfileStore.getState().saveProfile();
+      const result = await useProfileStore.getState().saveProfile();
 
-      expect(useProfileStore.getState().isSaving).toBe(true);
-
-      await vi.advanceTimersByTimeAsync(800);
-      await savePromise;
-
+      expect(result).toBe(true);
+      expect(apiClient.put).toHaveBeenCalledWith('/profile', expect.objectContaining({
+        firstName: 'John',
+        lastName: 'Doe',
+      }));
       const state = useProfileStore.getState();
       expect(state.isSaving).toBe(false);
       expect(state.isDirty).toBe(false);
       expect(state.lastSaved).toBeTruthy();
+      expect(state.saveError).toBeNull();
+    });
 
-      vi.useRealTimers();
+    it('should set saveError and return false on API failure', async () => {
+      vi.mocked(apiClient.put).mockRejectedValue(new Error('Network error'));
+
+      useProfileStore.getState().updateField('firstName', 'John');
+      useProfileStore.getState().updateField('lastName', 'Doe');
+
+      const result = await useProfileStore.getState().saveProfile();
+
+      expect(result).toBe(false);
+      const state = useProfileStore.getState();
+      expect(state.isSaving).toBe(false);
+      expect(state.saveError).toBe('Network error');
+    });
+  });
+
+  describe('loadProfile', () => {
+    it('should populate profile from API', async () => {
+      vi.mocked(apiClient.get).mockResolvedValue({
+        firstName: 'Jane',
+        lastName: 'Smith',
+        phone: '+1234567890',
+      });
+
+      await useProfileStore.getState().loadProfile();
+
+      const state = useProfileStore.getState();
+      expect(state.profile.firstName).toBe('Jane');
+      expect(state.isDirty).toBe(false);
+    });
+
+    it('should keep empty state when API returns error', async () => {
+      vi.mocked(apiClient.get).mockRejectedValue(new Error('Not found'));
+
+      await useProfileStore.getState().loadProfile();
+
+      expect(useProfileStore.getState().profile.firstName).toBe('');
     });
   });
 
