@@ -2,13 +2,22 @@
 
 import { type ReactNode, useState, useEffect, useCallback } from 'react';
 
+type ModalSize = 'sm' | 'md' | 'lg';
+
+const SIZE_CLASSES: Record<ModalSize, string> = {
+  sm: 'max-w-sm',
+  md: 'max-w-lg',
+  lg: 'max-w-2xl',
+};
+
 interface ModalProps {
   open: boolean;
   onClose: () => void;
   children: ReactNode;
+  size?: ModalSize;
 }
 
-export function Modal({ open, onClose, children }: ModalProps): ReactNode {
+export function Modal({ open, onClose, children, size = 'sm' }: ModalProps): ReactNode {
   const [mounted, setMounted] = useState(false);
   const [visible, setVisible] = useState(false);
 
@@ -56,7 +65,7 @@ export function Modal({ open, onClose, children }: ModalProps): ReactNode {
 
       {/* Panel */}
       <div
-        className="relative w-full max-w-sm mx-4 rounded-2xl p-6 shadow-2xl transition-all duration-300 ease-out"
+        className={`relative w-full ${SIZE_CLASSES[size]} mx-4 rounded-2xl p-6 shadow-2xl transition-all duration-300 ease-out`}
         style={{
           background: 'var(--color-surface)',
           border: '1px solid var(--color-border-card)',
@@ -88,11 +97,15 @@ export function ModalHeader({ children }: ModalHeaderProps): ReactNode {
 
 interface ModalBodyProps {
   children: ReactNode;
+  className?: string;
 }
 
-export function ModalBody({ children }: ModalBodyProps): ReactNode {
+export function ModalBody({ children, className }: ModalBodyProps): ReactNode {
   return (
-    <div className="text-sm mb-5" style={{ color: 'var(--color-text-secondary)' }}>
+    <div
+      className={`text-sm mb-5 ${className ?? ''}`}
+      style={{ color: 'var(--color-text-secondary)' }}
+    >
       {children}
     </div>
   );
