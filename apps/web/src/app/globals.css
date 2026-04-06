@@ -142,6 +142,38 @@ input::placeholder {
   background-size: 180px 180px;
 }
 
+/* ── Hero (dark default) ──────────────────────────────────────── */
+
+.hero-bg {
+  background: rgb(6 0 16);
+}
+
+.hero-vignette {
+  background: radial-gradient(ellipse 60% 45% at 50% 50%, rgba(6, 0, 16, 0.5), transparent 80%);
+}
+
+.hero-pill {
+  border-radius: 50px;
+  background: rgba(6, 0, 16, 0.85);
+  border: 1px solid rgba(134, 96, 250, 0.2);
+  backdrop-filter: blur(12px);
+}
+
+.hero-heading-alt {
+  color: #fff;
+}
+
+.hero-btn-secondary {
+  color: rgba(255, 255, 255, 0.7);
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+.hero-btn-secondary:hover {
+  border-color: rgba(255, 255, 255, 0.25);
+  color: #fff;
+}
+
 /* ── Light Theme Overrides ──────────────────────────────────────── */
 
 [data-theme="light"] {
@@ -186,4 +218,34 @@ input::placeholder {
 
 [data-theme="light"] ::-webkit-scrollbar-thumb:hover {
   background: rgba(124, 58, 237, 0.35);
+}
+
+/* ── Hero light variant ─────────────────────────────────────────── */
+
+[data-theme="light"] .hero-bg {
+  background: #f0ecf8;
+}
+
+[data-theme="light"] .hero-vignette {
+  background: radial-gradient(ellipse 60% 45% at 50% 50%, rgba(240, 236, 248, 0.5), transparent 80%);
+}
+
+[data-theme="light"] .hero-pill {
+  background: rgba(255, 255, 255, 0.85);
+  border: 1px solid rgba(124, 58, 237, 0.15);
+}
+
+[data-theme="light"] .hero-heading-alt {
+  color: #1a1025;
+}
+
+[data-theme="light"] .hero-btn-secondary {
+  color: rgba(26, 16, 37, 0.7);
+  background: rgba(124, 58, 237, 0.06);
+  border: 1px solid rgba(124, 58, 237, 0.15);
+}
+
+[data-theme="light"] .hero-btn-secondary:hover {
+  border-color: rgba(124, 58, 237, 0.3);
+  color: #1a1025;
 }
