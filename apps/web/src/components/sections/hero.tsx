@@ -1,38 +1,23 @@
 "use client";
 
 import { GradientText } from "../ui/gradient-text";
-import { ParticleCanvas } from "../ui/particle-canvas";
+import { FinanceCanvas } from "../ui/finance-canvas";
 
 export function Hero() {
   return (
-    <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
-      {/* Layer 1: Ambient particle canvas */}
-      <ParticleCanvas />
+    <section
+      className="relative min-h-screen flex items-center justify-center overflow-hidden"
+      style={{ background: 'rgb(6 0 16)' }}
+    >
+      {/* Layer 1: Finance-themed animated canvas */}
+      <FinanceCanvas />
 
-      {/* Layer 2: Gradient blobs */}
+      {/* Layer 2: Center vignette so text stays readable over the vivid canvas */}
       <div
         className="absolute inset-0 pointer-events-none"
         style={{
-          background: [
-            "radial-gradient(ellipse 600px 500px at 30% 40%, rgba(134,96,250,0.12), transparent)",
-            "radial-gradient(ellipse 500px 400px at 70% 55%, rgba(217,119,6,0.06), transparent)",
-            "radial-gradient(ellipse 400px 350px at 50% 30%, rgba(168,85,247,0.08), transparent)",
-          ].join(", "),
-          opacity: 0.8,
-        }}
-      />
-
-      {/* Layer 3: Radial vignette */}
-      <div
-        className="absolute pointer-events-none"
-        style={{
-          width: 1200,
-          height: 1200,
-          left: "50%",
-          top: "55%",
-          transform: "translate(-50%, -50%)",
           background:
-            "radial-gradient(circle, rgba(6,0,16,0.5), transparent 70%)",
+            "radial-gradient(ellipse 70% 50% at 50% 50%, rgba(6,0,16,0.55), transparent 80%)",
         }}
       />
 
