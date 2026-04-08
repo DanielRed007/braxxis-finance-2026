@@ -1,8 +1,10 @@
 'use client';
 
-import { type ReactNode, useState } from 'react';
+import { type ReactNode, useState, useCallback } from 'react';
 import type { TradeMode, OrderSide, OrderType, TradableAsset } from '@/data/trade-data';
 import { LEVERAGE_OPTIONS } from '@/data/trade-data';
+import { useTradingStore } from '@/stores/trading.store';
+import { parsePrice, formatCurrency, formatQuantity } from '@/lib/format-utils';
 
 interface OrderFormProps {
   mode: TradeMode;
@@ -15,12 +17,17 @@ const ORDER_TYPES: { id: OrderType; label: string }[] = [
   { id: 'stop-limit', label: 'Stop-Limit' },
 ];
 
-const AMOUNT_PRESETS = ['25%', '50%', '75%', '100%'];
+const AMOUNT_PRESETS = [0.25, 0.5, 0.75, 1] as const;
 
 export function OrderForm({ mode, asset }: OrderFormProps): ReactNode {
   const [side, setSide] = useState<OrderSide>('buy');
-  const [orderType, setOrderType] = useState<OrderType>('limit');
+  const [orderType, setOrderType] = useState<OrderType>('market');
   const [leverage, setLeverage] = useState(10);
+  const [amount, setAmount] = useState('');
+  const [price, setPrice] = useState('');
+  const [total, setTotal] = useState('');
+
+  const { isExecutingOrder, executeOrder, error, clearError, getBalance, getHoldingQuantity } = useTradingStore();
 
   const isBuy = side === 'buy';
   const sideColor = isBuy ? '#4ade80' : '#f87171';
@@ -28,13 +35,76 @@ export function OrderForm({ mode, asset }: OrderFormProps): ReactNode {
     ? (isBuy ? 'Long' : 'Short')
     : (isBuy ? 'Buy' : 'Sell');
 
+  const numericPrice = orderType === 'market'
+    ? parsePrice(asset.price)
+    : (Number(price) || parsePrice(asset.price));
+
+  const balance = getBalance();
+  const holdingQty = getHoldingQuantity(asset.symbol);
+
+  const updateAmount = useCallback((val: string): void => {
+    setAmount(val);
+    const qty = Number(val);
+    if (qty > 0 && numericPrice > 0) {
+      setTotal((qty * numericPrice).toFixed(2));
+    } else {
+      setTotal('');
+    }
+  }, [numericPrice]);
+
+  const updateTotal = useCallback((val: string): void => {
+    setTotal(val);
+    const t = Number(val);
+    if (t > 0 && numericPrice > 0) {
+      setAmount((t / numericPrice).toFixed(8));
+    } else {
+      setAmount('');
+    }
+  }, [numericPrice]);
+
+  const handlePreset = useCallback((pct: number): void => {
+    if (isBuy) {
+      const maxSpend = balance * pct;
+      if (numericPrice > 0) {
+        const qty = maxSpend / numericPrice;
+        setAmount(qty.toFixed(8));
+        setTotal(maxSpend.toFixed(2));
+      }
+    } else {
+      const qty = holdingQty * pct;
+      setAmount(qty.toFixed(8));
+      setTotal((qty * numericPrice).toFixed(2));
+    }
+  }, [isBuy, balance, holdingQty, numericPrice]);
+
+  const parsedAmount = Number(amount);
+  const parsedTotal = Number(total);
+
+  const canExecute = mode === 'spot'
+    && parsedAmount > 0
+    && numericPrice > 0
+    && !isExecutingOrder
+    && (isBuy ? parsedTotal <= balance : parsedAmount <= holdingQty);
+
+  const handleExecute = async (): Promise<void> => {
+    if (!canExecute) return;
+    clearError();
+    const success = await executeOrder({
+      symbol: asset.symbol,
+      side,
+      quantity: parsedAmount,
+      price: numericPrice,
+    });
+    if (success) {
+      setAmount('');
+      setTotal('');
+    }
+  };
+
   return (
     <div
       className="rounded-2xl p-5"
-      style={{
-        background: 'var(--color-surface)',
-        border: '1px solid var(--color-border-card)',
-      }}
+      style={{ background: 'var(--color-surface)', border: '1px solid var(--color-border-card)' }}
     >
       {/* Asset header */}
       <div className="flex items-center justify-between mb-4">
@@ -64,7 +134,7 @@ export function OrderForm({ mode, asset }: OrderFormProps): ReactNode {
         {(['buy', 'sell'] as const).map((s) => (
           <button
             key={s}
-            onClick={() => setSide(s)}
+            onClick={() => { setSide(s); setAmount(''); setTotal(''); }}
             className="flex-1 py-2.5 rounded-lg text-sm font-semibold capitalize transition-all duration-200"
             style={{
               background: side === s ? (s === 'buy' ? '#4ade80' : '#f87171') : 'transparent',
@@ -97,13 +167,8 @@ export function OrderForm({ mode, asset }: OrderFormProps): ReactNode {
       {mode !== 'spot' && (
         <div className="mb-4">
           <div className="flex items-center justify-between mb-2">
-            <span className="text-xs font-medium" style={{ color: 'var(--color-text-muted)' }}>
-              Leverage
-            </span>
-            <span
-              className="text-xs font-bold px-2 py-0.5 rounded-md"
-              style={{ background: 'rgba(134, 96, 250, 0.15)', color: '#a855f7' }}
-            >
+            <span className="text-xs font-medium" style={{ color: 'var(--color-text-muted)' }}>Leverage</span>
+            <span className="text-xs font-bold px-2 py-0.5 rounded-md" style={{ background: 'rgba(134, 96, 250, 0.15)', color: '#a855f7' }}>
               {leverage}x
             </span>
           </div>
@@ -142,27 +207,8 @@ export function OrderForm({ mode, asset }: OrderFormProps): ReactNode {
           >
             <input
               type="text"
-              defaultValue={asset.price}
-              className="flex-1 px-4 py-3 text-sm bg-transparent outline-none"
-              style={{ color: 'var(--color-text-primary)' }}
-            />
-            <span className="px-3 text-xs font-medium" style={{ color: 'var(--color-text-muted)' }}>USD</span>
-          </div>
-        </div>
-      )}
-
-      {orderType === 'stop-limit' && (
-        <div className="mb-3">
-          <label className="text-xs font-medium mb-1.5 block" style={{ color: 'var(--color-text-muted)' }}>
-            Limit Price
-          </label>
-          <div
-            className="flex items-center rounded-xl overflow-hidden"
-            style={{ border: '1px solid var(--color-border-card)', background: 'var(--color-input-bg)' }}
-          >
-            <input
-              type="text"
-              defaultValue={asset.price}
+              value={price || asset.price}
+              onChange={(e) => setPrice(e.target.value)}
               className="flex-1 px-4 py-3 text-sm bg-transparent outline-none"
               style={{ color: 'var(--color-text-primary)' }}
             />
@@ -173,9 +219,7 @@ export function OrderForm({ mode, asset }: OrderFormProps): ReactNode {
 
       {/* Amount input */}
       <div className="mb-3">
-        <label className="text-xs font-medium mb-1.5 block" style={{ color: 'var(--color-text-muted)' }}>
-          Amount
-        </label>
+        <label className="text-xs font-medium mb-1.5 block" style={{ color: 'var(--color-text-muted)' }}>Amount</label>
         <div
           className="flex items-center rounded-xl overflow-hidden"
           style={{ border: '1px solid var(--color-border-card)', background: 'var(--color-input-bg)' }}
@@ -183,6 +227,8 @@ export function OrderForm({ mode, asset }: OrderFormProps): ReactNode {
           <input
             type="text"
             placeholder="0.00"
+            value={amount}
+            onChange={(e) => updateAmount(e.target.value)}
             className="flex-1 px-4 py-3 text-sm bg-transparent outline-none"
             style={{ color: 'var(--color-text-primary)' }}
           />
@@ -195,19 +241,18 @@ export function OrderForm({ mode, asset }: OrderFormProps): ReactNode {
         {AMOUNT_PRESETS.map((pct) => (
           <button
             key={pct}
+            onClick={() => handlePreset(pct)}
             className="flex-1 py-1.5 rounded-lg text-xs font-medium transition-all duration-200 hover:brightness-90"
             style={{ background: 'var(--color-input-bg)', color: 'var(--color-text-secondary)' }}
           >
-            {pct}
+            {pct * 100}%
           </button>
         ))}
       </div>
 
       {/* Total */}
       <div className="mb-4">
-        <label className="text-xs font-medium mb-1.5 block" style={{ color: 'var(--color-text-muted)' }}>
-          Total
-        </label>
+        <label className="text-xs font-medium mb-1.5 block" style={{ color: 'var(--color-text-muted)' }}>Total</label>
         <div
           className="flex items-center rounded-xl overflow-hidden"
           style={{ border: '1px solid var(--color-border-card)', background: 'var(--color-input-bg)' }}
@@ -215,6 +260,8 @@ export function OrderForm({ mode, asset }: OrderFormProps): ReactNode {
           <input
             type="text"
             placeholder="0.00"
+            value={total}
+            onChange={(e) => updateTotal(e.target.value)}
             className="flex-1 px-4 py-3 text-sm bg-transparent outline-none"
             style={{ color: 'var(--color-text-primary)' }}
           />
@@ -243,19 +290,32 @@ export function OrderForm({ mode, asset }: OrderFormProps): ReactNode {
         </div>
       )}
 
+      {/* Error message */}
+      {error && (
+        <div className="text-xs text-center mb-3 py-2 px-3 rounded-lg" style={{ background: 'rgba(248, 113, 113, 0.1)', color: '#f87171' }}>
+          {error}
+        </div>
+      )}
+
       {/* Execute button */}
       <button
-        disabled
-        className="w-full py-3.5 rounded-xl text-sm font-bold transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+        disabled={!canExecute}
+        onClick={handleExecute}
+        className="w-full py-3.5 rounded-xl text-sm font-bold transition-all duration-200 disabled:opacity-40 disabled:cursor-not-allowed"
         style={{ background: sideColor, color: '#000' }}
       >
-        {sideLabel} {asset.symbol}
+        {isExecutingOrder ? 'Executing...' : `${sideLabel} ${asset.symbol}`}
       </button>
 
       {/* Available balance */}
       <div className="flex justify-between mt-3 text-xs" style={{ color: 'var(--color-text-muted)' }}>
         <span>Available</span>
-        <span style={{ color: 'var(--color-text-secondary)' }}>$12,450.00 USD</span>
+        <span style={{ color: 'var(--color-text-secondary)' }}>
+          {isBuy
+            ? formatCurrency(balance)
+            : `${formatQuantity(holdingQty)} ${asset.symbol}`
+          }
+        </span>
       </div>
     </div>
   );
