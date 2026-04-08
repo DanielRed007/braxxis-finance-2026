@@ -10,3 +10,6 @@ export * from './auth/index.js';
 
 // Profile domain
 export * from './profile/index.js';
+
+// Trading domain
+export * from './trading/index.js';

@@ -1,6 +1,6 @@
 'use client';
 
-import { type ReactNode, useState } from 'react';
+import { type ReactNode, useState, useEffect } from 'react';
 import { GradientText } from '@/components/ui/gradient-text';
 import { AssetSlider } from '@/components/trade/asset-slider';
 import { OrderForm } from '@/components/trade/order-form';
@@ -13,10 +13,16 @@ import {
   MOCK_RECENT_TRADES,
   type TradeMode,
 } from '@/data/trade-data';
+import { useTradingStore } from '@/stores/trading.store';
 
 export default function TradePage(): ReactNode {
   const [mode, setMode] = useState<TradeMode>('spot');
   const [selectedSymbol, setSelectedSymbol] = useState('BTC');
+  const loadWallet = useTradingStore((s) => s.loadWallet);
+
+  useEffect(() => {
+    loadWallet();
+  }, [loadWallet]);
 
   const selectedAsset = TRADABLE_ASSETS.find((a) => a.symbol === selectedSymbol) ?? TRADABLE_ASSETS[0];
 

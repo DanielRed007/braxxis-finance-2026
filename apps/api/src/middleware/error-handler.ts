@@ -8,6 +8,10 @@ import {
   ProfileNotFoundError,
   InvalidPhoneError,
   UnderageInvestorError,
+  InsufficientBalanceError,
+  InsufficientHoldingsError,
+  InvalidOrderError,
+  WalletNotFoundError,
 } from '@braxxis/domain';
 
 interface HttpErrorResponse {
@@ -36,6 +40,18 @@ function toHttpError(err: unknown): HttpErrorResponse {
   }
   if (err instanceof UnderageInvestorError) {
     return { status: 400, message: err.message };
+  }
+  if (err instanceof InsufficientBalanceError) {
+    return { status: 400, message: err.message };
+  }
+  if (err instanceof InsufficientHoldingsError) {
+    return { status: 400, message: err.message };
+  }
+  if (err instanceof InvalidOrderError) {
+    return { status: 400, message: err.message };
+  }
+  if (err instanceof WalletNotFoundError) {
+    return { status: 404, message: err.message };
   }
   if (err instanceof DomainError) {
     return { status: 400, message: err.message };
